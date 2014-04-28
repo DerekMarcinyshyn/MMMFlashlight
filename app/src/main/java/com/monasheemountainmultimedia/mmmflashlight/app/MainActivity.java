@@ -67,6 +67,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         });
     }
 
+    /** Set the Surface View for camera preview and keep screen on */
     private void setSurfaceView() {
         preview = (SurfaceView) this.findViewById(R.id.PREVIEW);
         mHolder = preview.getHolder();
@@ -79,7 +80,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         if (!isFlashOn) {
             // sanity check
             if (camera == null || params == null) {
-                Log.v("MMM: ", "turnOnFlash - camera and param are null");
+                Log.w("MMM: ", "turnOnFlash - camera and param are null");
                 return;
             }
 
@@ -106,7 +107,7 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
         if (isFlashOn) {
             // sanity check
             if (camera == null || params == null) {
-                return;
+                camera = Camera.open();
             }
 
             params = camera.getParameters();
@@ -133,14 +134,21 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     @Override
     protected void onDestroy() {
+        Log.v("onDestroy", "INIT onDestroy");
+        if (camera != null) {
+            turnOffFlash();
+            camera.release();
+        }
         super.onDestroy();
-        turnOffFlash();
     }
 
     @Override
     protected void onPause() {
+        Log.v("onPause", "INIT onPause");
+
+        //turnOffFlash();
+        //camera.release();
         super.onPause();
-        turnOffFlash();
     }
 
     @Override
@@ -161,8 +169,15 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     @Override
     protected void onStop() {
-        super.onStop();
+        Log.v("onStop", "INIT onStop");
+
         turnOffFlash();
+        if (camera != null) {
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+        }
+        super.onStop();
     }
 
     @Override
@@ -174,6 +189,8 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
     public void surfaceCreated(SurfaceHolder surfaceHolder) {
         // set the preview display of the camera to the holder surface view
         try {
+            if (camera == null)
+                camera = Camera.open();
             camera.setPreviewDisplay(mHolder);
         } catch (IOException e) {
             //e.printStackTrace();
@@ -183,6 +200,12 @@ public class MainActivity extends Activity implements SurfaceHolder.Callback {
 
     @Override
     public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-        camera.stopPreview();
+        Log.v("surfaceDestroyed", "SurfaceHolder");
+
+        if (camera != null) {
+            camera.stopPreview();
+            camera.release();
+            camera = null;
+        }
     }
 }

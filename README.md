@@ -7,3 +7,9 @@ Feel free to fork this and create your own custom flashlight.
 ## Google Play Store
 
 The app is available here [MMM Flashlight](https://play.google.com/store/apps/details?id=com.monasheemountainmultimedia.mmmflashlight.app)
+
+## Changelog
+
+1.1 fix camera not working after using MMM Flashlight
+
+1.0 initial release
